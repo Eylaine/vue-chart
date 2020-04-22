@@ -1,15 +1,31 @@
 <template>
-  <div id="demo" style="height: 400px; width: 600px"></div>
+  <div>
+    <div id="demo" style="height: 400px; width: 600px"></div>
+    <div style="height: 400px; width: 600px">
+      {{ this.timeList.split(',') }} <br>
+      {{ this.groupList.split(',') }}<br>
+      {{ this.caseList.split(',') }}<br>
+      {{ this.apiList.split(',') }}<br>
+      {{ this.execList.split(',') }}
+    </div>
+  </div>
 </template>
 
 <script>
 import echarts from 'echarts'
+import { queryAll } from '@/api/mock-demo'
 
 export default {
   name: "line-chart",
   data () {
     return {
-      chart: null
+      chart: null,
+      timeList: '',
+      groupList: '',
+      caseList: '',
+      apiList: '',
+      execList: '',
+      dataSet: ''
     }
   },
   mounted() {
@@ -18,46 +34,131 @@ export default {
   methods: {
     drawLine() {
       this.chart = echarts.init(document.getElementById("demo"))
-      const option = {
-        legend: {},
-        tooltip: {
-          trigger: 'axis',
-          showContent: false
-        },
-        dataset: {
-          source: [
-            ['product', '2012', '2013', '2014', '2015', '2016', '2017'],
-            ['Matcha Latte', 41.1, 30.4, 65.1, 53.3, 83.8, 98.7],
-            ['Milk Tea', 86.5, 92.1, 85.7, 83.1, 73.4, 55.1],
-            ['Cheese Cocoa', 24.1, 67.2, 79.5, 86.4, 65.2, 82.5],
-            ['Walnut Brownie', 55.2, 67.1, 69.2, 72.4, 53.9, 39.1]
-          ]
-        },
-        xAxis: {type: 'category'},
-        yAxis: {gridIndex: 0},
-        grid: {top: '55%'},
-        series: [
-          {type: 'line', smooth: true, seriesLayoutBy: 'row'},
-          {type: 'line', smooth: true, seriesLayoutBy: 'row'},
-          {type: 'line', smooth: true, seriesLayoutBy: 'row'},
-          {type: 'line', smooth: true, seriesLayoutBy: 'row'},
-          {
-            type: 'pie',
-            id: 'pie',
-            radius: '30%',
-            center: ['50%', '25%'],
-            label: {
-              formatter: '{b}: {@2012} ({d}%)'
-            },
-            encode: {
-              itemName: 'product',
-              value: '2012',
-              tooltip: '2012'
+      queryAll().then(response => {
+        this.timeList = response.data.timeList
+        this.groupList = response.data.groupList
+        this.caseList = response.data.caseList
+        this.apiList = response.data.apiList
+        this.execList = response.data.execList
+      }).then(() => {
+        const option = {
+          title: {
+            text: '折线图堆叠'
+          },
+          tooltip: {
+            trigger: 'axis'
+          },
+          legend: {
+            data: ['用例组', '用例数', '接口数', '执行数']
+          },
+          grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+          },
+          toolbox: {
+            feature: {
+              saveAsImage: {}
             }
-          }
-        ]
-      }
-      this.chart.setOption(option)
+          },
+          xAxis: {
+            type: 'category',
+            boundaryGap: true,
+            data: this.timeList.split(',')
+            // data: [ "2020-04-19", "2020-04-20" ]
+          },
+          yAxis: {
+            type: 'value'
+          },
+          series: [
+            {
+              name: '用例组',
+              type: 'line',
+              data: this.groupList.split(',')
+              // data: [ "12", "15" ]
+            },
+            {
+              name: '用例数',
+              type: 'line',
+              data: this.caseList.split(',')
+              // data:  [ "130", "135" ]
+            },
+            {
+              name: '接口数',
+              type: 'line',
+              data: this.apiList.split(',')
+              // data: [ "120", "138" ]
+            },
+            {
+              name: '执行数',
+              type: 'line',
+              data: this.execList.split(',')
+              // data: [ "300", "299" ]
+            }
+          ]
+        }
+        this.chart.setOption(option)
+      })
+      // this.chart = echarts.init(document.getElementById("demo"))
+      // const option = {
+      //   title: {
+      //     text: '折线图堆叠'
+      //   },
+      //   tooltip: {
+      //     trigger: 'axis'
+      //   },
+      //   legend: {
+      //     data: ['用例组', '用例数', '接口数', '执行数']
+      //   },
+      //   grid: {
+      //     left: '3%',
+      //     right: '4%',
+      //     bottom: '3%',
+      //     containLabel: true
+      //   },
+      //   toolbox: {
+      //     feature: {
+      //       saveAsImage: {}
+      //     }
+      //   },
+      //   xAxis: {
+      //     type: 'category',
+      //     boundaryGap: true,
+      //     data: this.timeList.split(',')
+      //     // data: [ "2020-04-19", "2020-04-20" ]
+      //   },
+      //   yAxis: {
+      //     type: 'value'
+      //   },
+      //   series: [
+      //     {
+      //       name: '用例组',
+      //       type: 'line',
+      //       data: this.groupList.split(',')
+      //       // data: [ "12", "15" ]
+      //     },
+      //     {
+      //       name: '用例数',
+      //       type: 'line',
+      //       data: this.caseList.split(',')
+      //       // data:  [ "130", "135" ]
+      //     },
+      //     {
+      //       name: '接口数',
+      //       type: 'line',
+      //       data: this.apiList.split(',')
+      //       // data: [ "120", "138" ]
+      //     },
+      //     {
+      //       name: '执行数',
+      //       type: 'line',
+      //       data: this.execList.split(',')
+      //       // data: [ "300", "299" ]
+      //     }
+      //   ]
+      // }
+      // this.chart.setOption(option)
     }
   }
 }

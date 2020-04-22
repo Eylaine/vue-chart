@@ -1,7 +1,7 @@
-import request from "@/utils/request";
+import axios from 'axios'
+
+axios.defaults.baseURL = 'http://localhost:8088/taskCenter'
 
 export function queryAll() {
-  return request.fetchGet(
-    ''
-  )
+  return axios.get('/chart/countor')
 }
